@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Bitcoin market data">
+
+    <title>btc Market Monitor</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="lib/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
+    <!-- Google charts -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="page-header">
+        <h1 class="text-muted">btc Market Monitor</h1>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">High: <span class="high"></span></div>
+        <div class="col-sm-4">Volume: <span class="volume"></span></div>
+        <div class="col-sm-4">VWAP: <span class="vwap"></span></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">Low: <span class="low"></span></div>
+        <div class="col-sm-4">Range: <span class="range"></span></div>
+        <div class="col-sm-4">Volatility: <span class="volatility"></span></div>
+      </div>
+      <div class="clearfix">
+        <h3 class="text-muted">Price Distribution<small> Last 24 Hours</small></h3>
+      </div>
+      <div id="priceDistChart">
+
+      </div>
+      <hr>
+      <h3 class="text-muted col-sm-6 noPadding">Recent Trades</h3>
+      <div class="tradeContainer clearfix">
+        <table class="table">
+          <tr class='headerRow'><th>Time</th><th>Price</th><th>Quantity</th><th>USD Value</th><th>Exchange</th></tr>
+        </table>
+      </div>
+      <div class="footer">
+        <span class="col-sm-9">Disclaimer: Data may not be accurate.</span>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Javascript -->
+    <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
