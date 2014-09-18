@@ -5,12 +5,17 @@ google.load("visualization", "1", {packages:["corechart"]});
 // Cache jquery variables for easy reference
 var $headerRow = $('tr.headerRow:first');
 var $tradeSizeFilter = $('input.tradeSizeFilter');
-var $high = $('span.high');
-var $low = $('span.low');
-var $vwap = $('span.vwap');
-var $volume = $('span.volume');
-var $volatility = $('span.volatility');
-var $range = $('span.range');
+var $high = $('div.high');
+var $low = $('div.low');
+var $vwap = $('div.vwap');
+var $btcVolume = $('div.btcVolume');
+var $volatility = $('div.volatility');
+var $range = $('div.range');
+var $numTrades = $('div.numTrades');
+var $usdVolume = $('div.usdVolume');
+var $aveTrade = $('div.aveTrade');
+var tradeCount = 0;
+var maxTrades = 20;
 var digits = 2; // Number of digits for formatting price and ammount
 
 // Google Charts variables
@@ -42,9 +47,18 @@ var formatTrade = function(trade) {
   return fTrade;
 };
 
+var removeOldestTrade = function() {
+  $('table.table tr:last-child').remove();
+  tradeCount--;
+};
+
 var addTrade = function(trade) {
   trade = formatTrade(trade);
   $headerRow.after(template(trade));
+  tradeCount++;
+  if (tradeCount > maxTrades) {
+    removeOldestTrade();
+  }
 };
 
 ////////////////////////////////////////////////////////////////
@@ -58,12 +72,15 @@ trades.on('trade', function(trade) {
 
 var summary = io('http://broadcastserver.azurewebsites.net:80/BTC/USD/summary');
 summary.on('update', function(data) {
-  $high.text(data.high.toFixed(digits));
-  $low.text(data.low.toFixed(digits));
-  $vwap.text(data.vwap.toFixed(digits));
-  $volume.text(data.volume.toFixed(digits));
+  $high.text('$' + data.high.toFixed(digits));
+  $low.text('$' + data.low.toFixed(digits));
+  $vwap.text('$' + data.vwap.toFixed(digits));
+  $btcVolume.text(Math.round(data.volume).toLocaleString() + ' BTC');
+  $usdVolume.text('$' + Math.round(data.volume * data.vwap).toLocaleString());
   $range.text((data.range * 100).toFixed(digits) + '%');
-  $volatility.text(data.variance.toFixed(digits));
+  $volatility.text('$' + data.standardDeviation.toFixed(digits));
+  $numTrades.text(Math.round(data.numTrades).toLocaleString());
+  $aveTrade.text((data.volume / data.numTrades).toFixed(digits) + ' BTC');
 });
 
 var priceDistribution = io('http://broadcastserver.azurewebsites.net:80/BTC/USD/priceDistribution');
