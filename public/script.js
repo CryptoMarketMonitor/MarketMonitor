@@ -20,6 +20,8 @@ var digits = 2; // Number of digits for formatting price and ammount
 
 // Google Charts variables
 var chartsReady = false;
+
+// Price Distribution Chart
 var priceDistChart;
 var rawPriceDistData;
 var priceDistData;
@@ -28,6 +30,35 @@ var priceDistOptions = {
     vAxis: { title: 'Quantity' },
     theme: 'maximized',
     isStacked: true
+};
+
+//Price Chart
+var priceChart;
+var rawPriceChartData;
+var priceChartData;
+var priceChartOptions = {
+  chartArea: { width: '100%', height: '100%' },
+  axisTitlesPosition: 'in',
+  legend: 'none',
+  vAxis: { title: 'USD Price per BTC', textPosition: 'in' },
+  hAxis: { textPosition: 'in' },
+  curveType: 'function',
+  intervals: { style: 'area' },
+  tooltip: { isHtml: true },
+  crosshair: { trigger: 'selection' }
+};
+
+// Volume Chart
+var volumeChart;
+var volumeChartData;
+var volumeChartOptions = {
+  chartArea: { width: '100%', height: '100%' },
+  axisTitlesPosition: 'in',
+  legend: 'none',
+  hAxis: { textPosition: 'in' },
+  vAxis: { title: 'BTC Volume', textPosition: 'in' },
+  tooltip: { isHtml: true },
+  crosshair: { trigger: 'selection' }
 };
 
 // Trade Formatting logic
@@ -62,15 +93,15 @@ var addTrade = function(trade) {
 };
 
 ////////////////////////////////////////////////////////////////
-// This is the part of the app that connects with the server. //
+// This is the part of the app that connects with the server.
 ////////////////////////////////////////////////////////////////
 
-var trades = io('http://broadcastserver.azurewebsites.net:80/BTC/USD/trades');
+var trades = io('http://api.marketmonitor.io:80/BTC/USD/trades');
 trades.on('trade', function(trade) {
   addTrade(trade);
 });
 
-var summary = io('http://broadcastserver.azurewebsites.net:80/BTC/USD/summary');
+var summary = io('http://api.marketmonitor.io:80/BTC/USD/summary');
 summary.on('update', function(data) {
   $high.text('$' + data.high.toFixed(digits));
   $low.text('$' + data.low.toFixed(digits));
@@ -83,7 +114,7 @@ summary.on('update', function(data) {
   $aveTrade.text((data.volume / data.numTrades).toFixed(digits) + ' BTC');
 });
 
-var priceDistribution = io('http://broadcastserver.azurewebsites.net:80/BTC/USD/priceDistribution');
+var priceDistribution = io('http://api.marketmonitor.io:80/BTC/USD/priceDistribution');
 priceDistribution.on('update', function(data) {
   rawPriceDistData = processPriceDistData(data);
   if (chartsReady) {
@@ -91,19 +122,48 @@ priceDistribution.on('update', function(data) {
   }
 });
 
+var priceData = io('http://api.marketmonitor.io:80/BTC/USD/priceCharts/fifteenMinutes');
+priceData.on('update', function(data) {
+  rawPriceChartData = processPriceChartData(data);
+  if (chartsReady) {
+    drawPriceChart();
+  }
+});
+
 
 
 ////////////////////////////////////////////////////////////////
-// This sets up the google chart.                             //
+// This sets up the google chart.                             
 ////////////////////////////////////////////////////////////////
 
 
 google.setOnLoadCallback(function() {
+  chartsReady = true;
+
+  // Price Distribution Chart Setup
   priceDistChart = new google
     .visualization
     .ColumnChart(document.getElementById('priceDistChart'));
-  chartsReady = true;
-  if (rawPriceDistData) drawPriceDistChart();
+  if (rawPriceDistData) { drawPriceDistChart(); }
+
+  // Price Chart Setup
+  priceChart = new google
+    .visualization
+    .LineChart(document.getElementById('priceChart'));
+  volumeChart = new google
+    .visualization
+    .AreaChart(document.getElementById('volumeChart'));
+  if (rawPriceChartData) { drawPriceChart(); }
+
+  // Set Charts Event Listeners
+  // This will enable the price chart and the volume chart to share crosshairs
+  google.visualization.events.addListener(priceChart, 'select', function() {
+    volumeChart.setSelection(priceChart.getSelection());
+  });
+  google.visualization.events.addListener(volumeChart, 'select', function() {
+    priceChart.setSelection(volumeChart.getSelection());
+  });
+
 });
 
 $tradeSizeFilter.change(function() {
@@ -114,7 +174,59 @@ $tradeSizeFilter.change(function() {
 var drawPriceDistChart = function() {
   priceDistData = google.visualization.arrayToDataTable(rawPriceDistData);
   priceDistChart.draw(priceDistData, priceDistOptions);
-}
+};
+
+var drawPriceChart = function() {
+  priceChartData = new google.visualization.DataTable(rawPriceChartData.price);
+  volumeChartData = new google.visualization.DataTable(rawPriceChartData.volume);
+  priceChart.draw(priceChartData, priceChartOptions);
+  volumeChart.draw(volumeChartData, volumeChartOptions);
+};
+var tooltipTemplate = _.template('<div class="price-chart-tooltip">' +
+                                 '<b><%= date %></b><br>' +
+                                 'VWAP: <b><%= vwap.toFixed(2) %></b><br>' + 
+                                 'High: <b><%= high.toFixed(2) %></b><br>' +
+                                 'Low: <b><%= low.toFixed(2) %></b><br>' +
+                                 'Volume: <b><%= volume.toFixed(2) %></b><br>' +
+                                 '</div>')
+var processPriceChartData = function(data) {
+  var dataTable = {};
+  dataTable.price = {};
+  dataTable.volume = {};
+  dataTable.price.cols = [
+    { id: 'date', label: 'Date', type: 'datetime' },
+    { id: 'vwap', label: 'VWAP', type: 'number' },
+    { id: 'high', type: 'number', type: 'number', role: 'interval' },
+    { id: 'low', type: 'number', type: 'number', role: 'interval' },
+    { id: 'tooltip', type: 'string', role: 'tooltip', p: { html: true } }
+  ];
+  dataTable.price.rows = [];
+  dataTable.volume.cols = [
+    { id: 'date', label: 'Date', type: 'datetime' },
+    { id: 'volume', label: 'Volume', type: 'number' },
+    { id: 'tooltip', type: 'string', role: 'tooltip', p: { html: true } }
+  ];
+  dataTable.volume.rows = [];
+  data.forEach(function(el) {
+    el.date = new Date(el.date);
+    dataTable.price.rows.push(
+      { c: [ 
+        { v: el.date },
+        { v: el.vwap },
+        { v: el.high },
+        { v: el.low },
+        {v: tooltipTemplate(el) }
+      ] } );
+
+    dataTable.volume.rows.push(
+      { c: [
+        { v: el.date },
+        { v: el.volume },
+        { v: tooltipTemplate(el) }
+      ] } );
+  });
+  return dataTable;
+};
 
 var processPriceDistData = function(data) {
   var exchanges = ['Exchanges'];
@@ -145,5 +257,4 @@ var processPriceDistData = function(data) {
     dataTable[y][x] = Number(el.volume.toFixed(2));
   });
   return dataTable;
-
 }
