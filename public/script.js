@@ -109,7 +109,7 @@ summary.on('update', function(data) {
   $btcVolume.text(Math.round(data.volume).toLocaleString() + ' BTC');
   $usdVolume.text('$' + Math.round(data.volume * data.vwap).toLocaleString());
   $range.text((data.range * 100).toFixed(digits) + '%');
-  $volatility.text('$' + data.standardDeviation.toFixed(digits));
+  $volatility.text((data.coefficientOfVariation * 100).toFixed(digits) + '%');
   $numTrades.text(Math.round(data.numTrades).toLocaleString());
   $aveTrade.text((data.volume / data.numTrades).toFixed(digits) + ' BTC');
 });
