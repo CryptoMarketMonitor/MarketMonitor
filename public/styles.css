@@ -30,6 +30,10 @@ body {
   padding-bottom: 10px;
 }
 
+.gauge {
+  margin: auto;
+}
+
 .noPadding {
   padding: 0;
 }

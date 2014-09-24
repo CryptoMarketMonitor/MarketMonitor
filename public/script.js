@@ -1,6 +1,6 @@
 
 // load google charts
-google.load("visualization", "1", {packages:["corechart"]});
+google.load("visualization", "1", {packages:["corechart", "gauge"]});
 
 // Cache jquery variables for easy reference
 var $headerRow = $('tr.headerRow:first');
@@ -59,6 +59,25 @@ var volumeChartOptions = {
   vAxis: { title: 'BTC Volume', textPosition: 'in' },
   tooltip: { isHtml: true },
   crosshair: { trigger: 'selection' }
+};
+
+// Market Stability Charts
+var coefficientOfVariationChart;
+var rawCoefficientOfVariationData;
+var coefficientOfVariationData;
+var rangeChart;
+var rawRangeData;
+var rangeData;
+var volumeGaugeChart;
+var rawVolumeGaugeData;
+var volumeGaugeData;
+var gaugeChartOptions = {
+  width: '220',
+  height: '220',
+  redFrom: 90,
+  redTo: 100,
+  yellowFrom:75,
+  yellowTo: 90
 };
 
 // Trade Formatting logic
@@ -130,7 +149,33 @@ priceData.on('update', function(data) {
   }
 });
 
+// Market Stability Data
+var coefficientOfVariation = io('http://api.marketmonitor.io:80/BTC/USD/coefficientOfVariation');
+coefficientOfVariation.on('update', function(data) {
+  var value = Math.round(data.percentile * 100);
+  rawCoefficientOfVariationData = [[ 'Label', 'Value' ], [ 'Volatility', value ]];
+  if (chartsReady) {
+    drawCoefficientOfVariationChart();
+  }
+});
 
+var rangeDetails = io('http://api.marketmonitor.io:80/BTC/USD/range');
+rangeDetails.on('update', function(data) {
+  var value = Math.round(data.percentile * 100);
+  rawRangeData = [[ 'Label', 'Value' ], [ 'Range', value ]];
+  if (chartsReady) {
+    drawRangeChart();
+  }
+});
+
+var volumeDetails = io('http://api.marketmonitor.io:80/BTC/USD/volume');
+volumeDetails.on('update', function(data) {
+  var value = Math.round(data.percentile * 100);
+  rawVolumeGaugeData = [[ 'Label', 'Value' ], [ 'Volume', value ]];
+  if (chartsReady) {
+    drawVolumeGaugeChart();
+  }
+});
 
 ////////////////////////////////////////////////////////////////
 // This sets up the google chart.                             
@@ -155,6 +200,20 @@ google.setOnLoadCallback(function() {
     .AreaChart(document.getElementById('volumeChart'));
   if (rawPriceChartData) { drawPriceChart(); }
 
+  // Market Stability Setup
+  coefficientOfVariationChart = new google
+    .visualization
+    .Gauge(document.getElementById('coefficientOfVariationChart'));
+  if (rawCoefficientOfVariationData) { drawCoefficientOfVariationChart(); }
+  rangeChart = new google
+    .visualization
+    .Gauge(document.getElementById('rangeChart'));
+  if(rawRangeData) { drawRangeChart(); }
+  volumeGaugeChart = new google
+    .visualization
+    .Gauge(document.getElementById('volumeGaugeChart'));
+  if (rawVolumeGaugeData) { drawVolumeGaugeChart(); }
+
   // Set Charts Event Listeners
   // This will enable the price chart and the volume chart to share crosshairs
   google.visualization.events.addListener(priceChart, 'select', function() {
@@ -176,6 +235,21 @@ var drawPriceDistChart = function() {
   priceDistChart.draw(priceDistData, priceDistOptions);
 };
 
+var drawCoefficientOfVariationChart = function() {
+  coefficientOfVariationData = google.visualization.arrayToDataTable(rawCoefficientOfVariationData);
+  coefficientOfVariationChart.draw(coefficientOfVariationData, gaugeChartOptions);
+};
+
+var drawRangeChart = function() {
+  rangeData = google.visualization.arrayToDataTable(rawRangeData);
+  rangeChart.draw(rangeData, gaugeChartOptions);
+};
+
+var drawVolumeGaugeChart = function() {
+  volumeGaugeData = google.visualization.arrayToDataTable(rawVolumeGaugeData);
+  volumeGaugeChart.draw(volumeGaugeData, gaugeChartOptions);
+};
+
 var drawPriceChart = function() {
   priceChartData = new google.visualization.DataTable(rawPriceChartData.price);
   volumeChartData = new google.visualization.DataTable(rawPriceChartData.volume);
@@ -188,7 +262,7 @@ var tooltipTemplate = _.template('<div class="price-chart-tooltip">' +
                                  'High: <b><%= high.toFixed(2) %></b><br>' +
                                  'Low: <b><%= low.toFixed(2) %></b><br>' +
                                  'Volume: <b><%= volume.toFixed(2) %></b><br>' +
-                                 '</div>')
+                                 '</div>');
 var processPriceChartData = function(data) {
   var dataTable = {};
   dataTable.price = {};
@@ -196,8 +270,8 @@ var processPriceChartData = function(data) {
   dataTable.price.cols = [
     { id: 'date', label: 'Date', type: 'datetime' },
     { id: 'vwap', label: 'VWAP', type: 'number' },
-    { id: 'high', type: 'number', type: 'number', role: 'interval' },
-    { id: 'low', type: 'number', type: 'number', role: 'interval' },
+    { id: 'high', type: 'number', role: 'interval' },
+    { id: 'low', type: 'number',  role: 'interval' },
     { id: 'tooltip', type: 'string', role: 'tooltip', p: { html: true } }
   ];
   dataTable.price.rows = [];
@@ -231,7 +305,7 @@ var processPriceChartData = function(data) {
 var processPriceDistData = function(data) {
   var exchanges = ['Exchanges'];
   var prices = [];
-  var dataTable = []
+  var dataTable = [];
   data.forEach(function(el) {
     if (!_.contains(exchanges, el.exchange)) {
       exchanges.push(el.exchange);
@@ -257,4 +331,4 @@ var processPriceDistData = function(data) {
     dataTable[y][x] = Number(el.volume.toFixed(2));
   });
   return dataTable;
-}
+};
