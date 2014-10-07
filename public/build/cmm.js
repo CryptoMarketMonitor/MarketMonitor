@@ -33888,19 +33888,6 @@ angular.module('cmm.pulse')
   $scope.chartData.priceDist = MarketData.priceDist;
 
 }]);
- angular.module('cmm.services', ['cmm.sockets'])
- .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 'TradeData',
-  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData, TradeData) {
-    return {
-      price: PriceData,
-      priceDist: PriceDistData,
-      cov: COVData,
-      volume: VolumeData,
-      range: RangeData,
-      summary: SummaryData,
-      trades: TradeData
-    };
- }]);
 angular.module('cmm.sockets', ['btford.socket-io'])
 .factory('Sockets', ['socketFactory', function (socketFactory) {
   var connections = {
@@ -33929,6 +33916,19 @@ angular.module('cmm.sockets', ['btford.socket-io'])
 
   return sockets;
 }]);
+ angular.module('cmm.services', ['cmm.sockets'])
+ .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 'TradeData',
+  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData, TradeData) {
+    return {
+      price: PriceData,
+      priceDist: PriceDistData,
+      cov: COVData,
+      volume: VolumeData,
+      range: RangeData,
+      summary: SummaryData,
+      trades: TradeData
+    };
+ }]);
 angular.module('cmm.tape', ['ui.router', 'cmm.services'])
 .config(function ($stateProvider, $urlRouterProvider) {  
   $stateProvider

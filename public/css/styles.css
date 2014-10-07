@@ -1,6 +1,7 @@
 /* general */
 body {
   font-family: 'Source Sans Pro', Helvetica Neue, sans-serif;
+  /*font-size: 100%;*/
   background: #fafafa;
 }
 article {
@@ -14,12 +15,9 @@ header h2 {
   text-transform: uppercase;
   margin-top: 0;
   font-weight: 100;
+  /*font-size: 1.5em;*/
 }
-@media (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
-}
+
 
 /* jumbotron */
 #intro {
@@ -94,6 +92,7 @@ header h2 {
 #summary h1 {
   margin: 0;
   color: #F09819;
+  font-size: 1.2em;
 }
 #summary span {
   text-transform: uppercase;
@@ -109,7 +108,10 @@ header h2 {
 #summary section div:last-child {
   padding-left: 30px;
   padding-right: 0;
-}            
+}      
+#market-stability section {
+  text-align: center;
+}      
 .col-chart {
   padding: 0 15px;
 }
@@ -120,4 +122,16 @@ header h2 {
 /* tape */
 #tape table {
   background: white;
+}
+
+
+/* mobile */
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+  #summary h1 {
+    font-size: 2.6em;
+  }  
 }

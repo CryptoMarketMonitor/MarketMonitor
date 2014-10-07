@@ -13,7 +13,7 @@
         <span>Num. Trades</span>
       </div>
       <div class="col-xs-4">
-        <h1>{{ summary.avgTrade | number: 2 }}BTC</h1>
+        <h1>{{ summary.avgTrade | number: 2 }} BTC</h1>
         <span>Mean Trade</span>
       </div>
     </section>
@@ -72,9 +72,9 @@
                                         ns-popover-theme="ns-popover-tooltip-theme"
                                         ns-popover-placement="left"></span></h2></header>
     <section class="row">
-      <div class="col-xs-4"><cov-chart data="chartData.cov"></cov-chart></div>
-      <div class="col-xs-4"><range-chart data="chartData.range"></range-chart></div>
-      <div class="col-xs-4"><volume-chart data="chartData.volume"></volume-chart></div>
+      <div class="col-xs-12 col-sm-4"><cov-chart data="chartData.cov"></cov-chart></div>
+      <div class="col-xs-12 col-sm-4"><range-chart data="chartData.range"></range-chart></div>
+      <div class="col-xs-12 col-sm-4"><volume-chart data="chartData.volume"></volume-chart></div>
     </section>    
   </article>
   
