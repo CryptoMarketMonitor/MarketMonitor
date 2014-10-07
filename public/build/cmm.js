@@ -33876,11 +33876,10 @@ angular.module('cmm.pulse', ['cmm.services', 'ui.router'])
 }]);
 angular.module('cmm.pulse')
 .controller('PulseCtrl', ['$scope', 'MarketData', function ($scope, MarketData) {
-  console.log('instantiated PulseCtrl')
   $scope.chartData = {};
   
   $scope.summary = MarketData.summary;
-  window.md = MarketData;
+  
   $scope.chartData.cov = MarketData.cov;
   $scope.chartData.range = MarketData.range;
   $scope.chartData.volume = MarketData.volume;
@@ -33892,7 +33891,6 @@ angular.module('cmm.pulse')
  angular.module('cmm.services', ['cmm.sockets'])
  .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 'TradeData',
   function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData, TradeData) {
-    console.log('instantiated marketdata');
     return {
       price: PriceData,
       priceDist: PriceDistData,
@@ -33905,7 +33903,6 @@ angular.module('cmm.pulse')
  }]);
 angular.module('cmm.sockets', ['btford.socket-io'])
 .factory('Sockets', ['socketFactory', function (socketFactory) {
-  console.log('instantiated Sockets')
   var connections = {
     cov: io.connect('http://api.marketmonitor.io:80/BTC/USD/coefficientOfVariation'),
     range: io.connect('http://api.marketmonitor.io:80/BTC/USD/range'),    

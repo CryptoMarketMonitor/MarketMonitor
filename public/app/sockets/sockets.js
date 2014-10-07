@@ -1,6 +1,5 @@
 angular.module('cmm.sockets', ['btford.socket-io'])
 .factory('Sockets', ['socketFactory', function (socketFactory) {
-  console.log('instantiated Sockets')
   var connections = {
     cov: io.connect('http://api.marketmonitor.io:80/BTC/USD/coefficientOfVariation'),
     range: io.connect('http://api.marketmonitor.io:80/BTC/USD/range'),    
