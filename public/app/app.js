@@ -1,14 +1,18 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
 angular.module('cmm', [
   'ui.router',
   'nsPopover',
+  'cmm.services',
   'cmm.pulse',
   'cmm.tape'
 ])
+.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {  
+  $stateProvider
+    .state('api', {
+      url: '/api',
+      templateUrl: './api.html',
+    });
+    $urlRouterProvider.otherwise('/pulse');
+}])
 .directive('cmmSplash', [function () {
   return {
     restrict: 'E',

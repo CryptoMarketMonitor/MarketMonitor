@@ -33878,9 +33878,9 @@ angular.module('cmm.pulse')
 .controller('PulseCtrl', ['$scope', 'MarketData', function ($scope, MarketData) {
   console.log('instantiated PulseCtrl')
   $scope.chartData = {};
-  console.log(MarketData)
-  $scope.summary = MarketData.summary;
   
+  $scope.summary = MarketData.summary;
+  window.md = MarketData;
   $scope.chartData.cov = MarketData.cov;
   $scope.chartData.range = MarketData.range;
   $scope.chartData.volume = MarketData.volume;
@@ -33890,8 +33890,8 @@ angular.module('cmm.pulse')
 
 }]);
  angular.module('cmm.services', ['cmm.sockets'])
- .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 
-  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData) {
+ .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 'TradeData',
+  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData, TradeData) {
     console.log('instantiated marketdata');
     return {
       price: PriceData,
@@ -33899,7 +33899,8 @@ angular.module('cmm.pulse')
       cov: COVData,
       volume: VolumeData,
       range: RangeData,
-      summary: SummaryData
+      summary: SummaryData,
+      trades: TradeData
     };
  }]);
 angular.module('cmm.sockets', ['btford.socket-io'])
@@ -33931,7 +33932,7 @@ angular.module('cmm.sockets', ['btford.socket-io'])
 
   return sockets;
 }]);
-angular.module('cmm.tape', ['ui.router', 'cmm.sockets'])
+angular.module('cmm.tape', ['ui.router', 'cmm.services'])
 .config(function ($stateProvider, $urlRouterProvider) {  
   $stateProvider
     .state('tape', {
@@ -33942,37 +33943,8 @@ angular.module('cmm.tape', ['ui.router', 'cmm.sockets'])
 
     $urlRouterProvider.otherwise('/pulse');
 })
-.factory('Trades', ['Sockets', function (Sockets) {
-  var tape = [];
-  var trades = Sockets.trades;
-  
-  var formatTrade = function(trade) {
-    var fTrade = {};
-    var date = new Date(trade.date);
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
-    
-    fTrade.hours = '' + date.getHours();
-    fTrade.minutes = minutes < 10 ? '0' + minutes : '' + minutes;
-    fTrade.seconds = seconds < 10 ? '0' + seconds : '' + seconds;
-    fTrade.price = trade.price;
-    fTrade.amount = trade.amount;
-    fTrade.usd = '$' + (trade.price * trade.amount);
-    fTrade.exchange = trade.exchange;
-    return fTrade;
-  };
-
-  trades.on('trade', function(trade) {
-    tape.unshift(formatTrade(trade));
-    if (tape.length > 20) tape.pop();
-  });
-
-  return {
-    tape: tape,
-  };
-}])
-.controller('TapeCtrl', ['$scope', 'Trades', function ($scope, Trades) {
-  $scope.tape = Trades.tape;
+.controller('TapeCtrl', ['$scope', 'MarketData', function ($scope, MarketData) {
+  $scope.tape = MarketData.trades.tape;
 }]);
 angular.module('cmm.pulse')
 .directive('btcVolumeChart', ['$filter', function ($filter) {
@@ -34105,7 +34077,6 @@ angular.module('cmm.services')
   var summaryData = {};
 
   socket.on('update', function(data) {
-    console.log(data);
     summaryData.lastUpdate = (new Date()).toISOString();
 
     summaryData.high = data.high.toFixed(2);
@@ -34120,11 +34091,39 @@ angular.module('cmm.services')
     summaryData.numTrades = Math.round(data.numTrades);
     summaryData.avgTrade = (data.volume / data.numTrades);
 
-    summaryData.isLoaded = true;
-
   });  
 
   return summaryData;
+}]);
+angular.module('cmm.services')
+.factory('TradeData', ['Sockets', function (Sockets) {
+  var tape = [];
+  var trades = Sockets.trades;
+  
+  var formatTrade = function(trade) {
+    var fTrade = {};
+    var date = new Date(trade.date);
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    
+    fTrade.hours = '' + date.getHours();
+    fTrade.minutes = minutes < 10 ? '0' + minutes : '' + minutes;
+    fTrade.seconds = seconds < 10 ? '0' + seconds : '' + seconds;
+    fTrade.price = trade.price;
+    fTrade.amount = trade.amount;
+    fTrade.usd = '$' + (trade.price * trade.amount);
+    fTrade.exchange = trade.exchange;
+    return fTrade;
+  };
+
+  trades.on('trade', function(trade) {
+    tape.unshift(formatTrade(trade));
+    if (tape.length > 20) tape.pop();
+  });
+
+  return {
+    tape: tape,
+  };
 }]);
 angular.module('cmm.services')
 .factory('VolumeData', ['Sockets', function (Sockets) {
