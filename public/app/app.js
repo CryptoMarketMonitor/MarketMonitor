@@ -5,13 +5,15 @@ angular.module('cmm', [
   'cmm.pulse',
   'cmm.tape'
 ])
-.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {  
+.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {  
   $stateProvider
     .state('api', {
       url: '/api',
       templateUrl: './api.html',
     });
     $urlRouterProvider.otherwise('/pulse');
+
+    $locationProvider.html5Mode(true);
 }])
 .directive('cmmSplash', [function () {
   return {
