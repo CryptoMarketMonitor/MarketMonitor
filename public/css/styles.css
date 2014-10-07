@@ -15,6 +15,11 @@ header h2 {
   margin-top: 0;
   font-weight: 100;
 }
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
 
 /* jumbotron */
 #intro {
@@ -98,7 +103,6 @@ header h2 {
   margin: 20px 0;
   color: #444;
 }
-
 #summary section :first-child {
   padding-left: 0;
 }      
