@@ -1,0 +1,81 @@
+<section id="pulse" class="row">
+  <header class="time-period"> last 24hrs </header>
+  <article id="summary">
+    <header><h2>Summary</h2></header>
+    
+    <section class="row">
+      <div class="col-xs-4">
+        <h1>{{ summary.volatility | number: 2 }}%</h1>
+        <span>Volatility</span>
+      </div>
+      <div class="col-xs-4">
+        <h1>{{ summary.numTrades | number: 0 }}</h1>
+        <span>Num. Trades</span>
+      </div>
+      <div class="col-xs-4">
+        <h1>{{ summary.avgTrade | number: 2 }}%</h1>
+        <span>Mean Trade</span>
+      </div>
+    </section>
+
+    <section class="row">
+      <div class="col-xs-4">
+        <h1>{{ summary.volumeBTC | number: 0 }} BTC</h1>
+        <span>BTC Vol.</span>
+      </div>
+      <div class="col-xs-4">
+        <h1>${{ summary.volumeUSD | number: 0 }}</h1>
+        <span>USD Vol.</span>
+      </div>
+      <div class="col-xs-4">
+        <h1>{{ summary.vwap | currency }}</h1>
+        <span>VWAP</span>
+      </div>
+    </section>
+
+    <section class="row">
+      <div class="col-xs-4">
+        <h1>{{ summary.high | currency }}</h1>
+        <span>High</span>        
+      </div>
+      <div class="col-xs-4">
+        <h1>{{ summary.low | currency }}</h1>
+        <span>Low</span>        
+      </div>
+      <div class="col-xs-4">
+        <h1>{{ summary.range | number: 2 }}%</h1>
+        <span>Range</span>        
+      </div>
+    </section>    
+  </article>
+
+  <article id="price">
+    <header><h2>Price</h2></header>
+    <section class="row">
+      <price-chart data="chartData.price"></price-chart>
+      <btc-volume-chart data="chartData.btcVolume"></btc-volume-chart>
+    </section>
+  </article>
+  <article id="price-distribution">
+    <header><h2>Price Distribution</h2></header>
+    <section class="row">
+      <price-dist-chart data="chartData.priceDist"></price-dist-chart>
+    </section>    
+  </article>
+
+  <article id="market-stability">
+    <header><h2>Market Stability<span class="glyphicon glyphicon-info-sign"
+                                        ns-popover
+                                        ns-popover-template="popovers/market-stability.html" 
+                                        ns-popover-trigger="mouseenter" 
+                                        ns-popover-timeout="0"
+                                        ns-popover-theme="ns-popover-tooltip-theme"
+                                        ns-popover-placement="left"></span></h2></header>
+    <section class="row">
+      <div class="col-xs-4"><cov-chart data="chartData.cov"></cov-chart></div>
+      <div class="col-xs-4"><range-chart data="chartData.range"></range-chart></div>
+      <div class="col-xs-4"><volume-chart data="chartData.volume"></volume-chart></div>
+    </section>    
+  </article>
+  
+</section>
