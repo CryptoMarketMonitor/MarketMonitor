@@ -48,6 +48,12 @@ header h2 {
   display: block;
   position: absolute;        
 }
+.logo {
+  width: 270px;
+  position: absolute;
+  margin: 100px 50% 0;
+  left: -135px;
+}
 
 /* nav */
 #nav {
