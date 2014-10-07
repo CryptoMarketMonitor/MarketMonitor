@@ -1,0 +1,62 @@
+body {
+  font-family: arial, sans-serif;
+}
+
+a {
+  cursor: pointer;
+}
+
+button {
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  border: solid 1px #0096d6;
+  background: linear-gradient(#0096d6, #0081b8);
+  color: #fff;
+}
+
+button:hover,
+button:focus,
+button:active {
+  background: #0081b8;
+  border: solid 1px #0081b8;
+}
+
+body > section {
+  position: relative;
+  width: 100%;
+  max-width: 62.5em;
+  margin: 0 auto;
+  padding: 0 1.5em;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+article {
+  position: relative;
+  margin: 0 auto;
+}
+
+article + h1 {
+  clear: left;
+  display: block;
+}
+
+h1 {
+  border-bottom: solid 1px #b9b8bb;
+  padding-bottom: .5em;
+  display:block;
+}
+
+a {
+  cursor: pointer;
+  padding: 6px 12px;
+  text-decoration: underline;
+  color: #0096d6;
+}
+
+.ns-popover-tooltip a {
+  text-decoration: none;
+}

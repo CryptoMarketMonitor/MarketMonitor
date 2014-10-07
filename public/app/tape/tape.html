@@ -1,0 +1,16 @@
+<section id="tape" class="row">
+  <article id="trades">
+    <header><h2>Trades</h2></header>
+    <section>
+      <table class="table table-striped">
+        <thead><th>Amount</th><th>Price</th><th>Exchange</th></thead>
+        <tr ng-show="!tape.length" style="background:white;"><td colspan="3"><div class="throbber"></div></td></tr>
+        <tr ng-repeat="trade in tape">
+          <td>{{trade.amount}}</td>
+          <td>{{trade.price | currency}}</td>
+          <td>{{trade.exchange}}</td>
+        </tr>
+      </table>
+    </section>
+  </article>
+</section>
