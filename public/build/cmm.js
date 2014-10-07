@@ -33664,17 +33664,21 @@ angular.module('ui.router.state')
     };
   });
 })(window, window.angular);
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
 angular.module('cmm', [
   'ui.router',
   'nsPopover',
+  'cmm.services',
   'cmm.pulse',
   'cmm.tape'
 ])
+.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {  
+  $stateProvider
+    .state('api', {
+      url: '/api',
+      templateUrl: './api.html',
+    });
+    $urlRouterProvider.otherwise('/pulse');
+}])
 .directive('cmmSplash', [function () {
   return {
     restrict: 'E',
@@ -33860,7 +33864,7 @@ angular.module('cmm', [
     }
   };
 }]);
-angular.module('cmm.pulse', ['pulse.services', 'ui.router'])
+angular.module('cmm.pulse', ['cmm.services', 'ui.router'])
 .config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {  
   $stateProvider
     .state('pulse', {
@@ -33872,8 +33876,9 @@ angular.module('cmm.pulse', ['pulse.services', 'ui.router'])
 }]);
 angular.module('cmm.pulse')
 .controller('PulseCtrl', ['$scope', 'MarketData', function ($scope, MarketData) {
+  console.log('instantiated PulseCtrl')
   $scope.chartData = {};
-  
+  console.log(MarketData)
   $scope.summary = MarketData.summary;
   
   $scope.chartData.cov = MarketData.cov;
@@ -33884,8 +33889,22 @@ angular.module('cmm.pulse')
   $scope.chartData.priceDist = MarketData.priceDist;
 
 }]);
+ angular.module('cmm.services', ['cmm.sockets'])
+ .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 
+  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData) {
+    console.log('instantiated marketdata');
+    return {
+      price: PriceData,
+      priceDist: PriceDistData,
+      cov: COVData,
+      volume: VolumeData,
+      range: RangeData,
+      summary: SummaryData
+    };
+ }]);
 angular.module('cmm.sockets', ['btford.socket-io'])
 .factory('Sockets', ['socketFactory', function (socketFactory) {
+  console.log('instantiated Sockets')
   var connections = {
     cov: io.connect('http://api.marketmonitor.io:80/BTC/USD/coefficientOfVariation'),
     range: io.connect('http://api.marketmonitor.io:80/BTC/USD/range'),    
@@ -34036,19 +34055,88 @@ angular.module('cmm.pulse')
     }
   };
 }]);
- angular.module('pulse.services', ['cmm.sockets'])
- .factory('MarketData', ['PriceData', 'PriceDistData', 'COVData', 'VolumeData', 'RangeData', 'SummaryData', 
-  function (PriceData, PriceDistData, COVData, VolumeData, RangeData, SummaryData) {
- 
-    return {
-      price: PriceData,
-      priceDist: PriceDistData,
-      cov: COVData,
-      volume: VolumeData,
-      range: RangeData,
-      summary: SummaryData
-    };
- }]);
+angular.module('cmm.services')
+.factory('COVData', ['Sockets', function (Sockets) {
+  var covSocket = Sockets.cov;
+  var cov = {};
+
+  covSocket.on('update', function(data) {
+    cov.percentile = data.percentile;
+  });
+
+  return cov;
+}]);
+angular.module('cmm.services')
+.factory('PriceData', ['Sockets', function (Sockets) {
+  var priceSocket = Sockets.priceData;
+  var priceData = [];
+
+  priceSocket.on('update', function(data) {
+    priceData.splice(0,1,data);
+  });
+
+  return priceData;
+}]);
+angular.module('cmm.services')
+.factory('PriceDistData', ['Sockets', function (Sockets) {
+  var priceDistSocket = Sockets.priceDist;
+  var priceDistData = [];
+
+  priceDistSocket.on('update', function(data) {
+    priceDistData.splice(0,1,data);
+  });
+
+  return priceDistData;
+}]);
+angular.module('cmm.services')
+.factory('RangeData', ['Sockets', function (Sockets) {
+  var rangeSocket = Sockets.range;
+  var range = {};
+
+  rangeSocket.on('update', function(data) {
+    range.percentile = data.percentile;
+  });
+
+  return range;
+}]);
+angular.module('cmm.services')
+.factory('SummaryData', ['Sockets', function (Sockets) {
+  var socket = Sockets.summary;
+  var summaryData = {};
+
+  socket.on('update', function(data) {
+    console.log(data);
+    summaryData.lastUpdate = (new Date()).toISOString();
+
+    summaryData.high = data.high.toFixed(2);
+    summaryData.low = data.low.toFixed(2);
+    summaryData.range = (data.range * 100);
+
+    summaryData.vwap = data.vwap.toFixed(2);
+    summaryData.volumeBTC = Math.round(data.volume);
+    summaryData.volumeUSD = Math.round(data.volume * data.vwap);
+
+    summaryData.volatility = (data.coefficientOfVariation * 100);
+    summaryData.numTrades = Math.round(data.numTrades);
+    summaryData.avgTrade = (data.volume / data.numTrades);
+
+    summaryData.isLoaded = true;
+
+  });  
+
+  return summaryData;
+}]);
+angular.module('cmm.services')
+.factory('VolumeData', ['Sockets', function (Sockets) {
+  var volumeSocket = Sockets.volume;
+  var volume = {};
+
+  volumeSocket.on('update', function(data) {
+    volume.percentile = data.percentile;
+  });
+
+  return volume;
+}]);
 angular.module('cmm.pulse')
 .directive('covChart', [function () {
   var chartOptions = {
@@ -34062,7 +34150,7 @@ angular.module('cmm.pulse')
 
   return {
     restrict: 'E',
-    template: '<div class="col"><div class="throbber"></div></div>',
+    template: '<div class="col"></div>',
     replace: true,
     scope: {
       data: '='
@@ -34344,85 +34432,4 @@ angular.module('cmm.pulse')
       }, true);
     }
   };
-}]);
-angular.module('pulse.services')
-.factory('COVData', ['Sockets', function (Sockets) {
-  var covSocket = Sockets.cov;
-  var cov = {};
-
-  covSocket.on('update', function(data) {
-    cov.percentile = data.percentile;
-  });
-
-  return cov;
-}]);
-angular.module('pulse.services')
-.factory('PriceData', ['Sockets', function (Sockets) {
-  var priceSocket = Sockets.priceData;
-  var priceData = [];
-
-  priceSocket.on('update', function(data) {
-    priceData.splice(0,1,data);
-  });
-
-  return priceData;
-}]);
-angular.module('pulse.services')
-.factory('PriceDistData', ['Sockets', function (Sockets) {
-  var priceDistSocket = Sockets.priceDist;
-  var priceDistData = [];
-
-  priceDistSocket.on('update', function(data) {
-    priceDistData.splice(0,1,data);
-  });
-
-  return priceDistData;
-}]);
-angular.module('pulse.services')
-.factory('RangeData', ['Sockets', function (Sockets) {
-  var rangeSocket = Sockets.range;
-  var range = {};
-
-  rangeSocket.on('update', function(data) {
-    range.percentile = data.percentile;
-  });
-
-  return range;
-}]);
-angular.module('pulse.services')
-.factory('SummaryData', ['Sockets', function (Sockets) {
-  var socket = Sockets.summary;
-  var summaryData = {};
-
-  socket.on('update', function(data) {
-    summaryData.lastUpdate = (new Date()).toISOString();
-
-    summaryData.high = data.high.toFixed(2);
-    summaryData.low = data.low.toFixed(2);
-    summaryData.range = (data.range * 100);
-
-    summaryData.vwap = data.vwap.toFixed(2);
-    summaryData.volumeBTC = Math.round(data.volume);
-    summaryData.volumeUSD = Math.round(data.volume * data.vwap);
-
-    summaryData.volatility = (data.coefficientOfVariation * 100);
-    summaryData.numTrades = Math.round(data.numTrades);
-    summaryData.avgTrade = (data.volume / data.numTrades);
-
-    summaryData.isLoaded = true;
-
-  });  
-
-  return summaryData;
-}]);
-angular.module('pulse.services')
-.factory('VolumeData', ['Sockets', function (Sockets) {
-  var volumeSocket = Sockets.volume;
-  var volume = {};
-
-  volumeSocket.on('update', function(data) {
-    volume.percentile = data.percentile;
-  });
-
-  return volume;
 }]);

@@ -11,7 +11,7 @@ angular.module('cmm.pulse')
 
   return {
     restrict: 'E',
-    template: '<div class="col"><div class="throbber"></div></div>',
+    template: '<div class="col"></div>',
     replace: true,
     scope: {
       data: '='

@@ -1,7 +1,8 @@
 angular.module('cmm.pulse')
 .controller('PulseCtrl', ['$scope', 'MarketData', function ($scope, MarketData) {
+  console.log('instantiated PulseCtrl')
   $scope.chartData = {};
-  
+  console.log(MarketData)
   $scope.summary = MarketData.summary;
   
   $scope.chartData.cov = MarketData.cov;

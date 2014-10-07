@@ -1,4 +1,4 @@
-angular.module('cmm.pulse', ['pulse.services', 'ui.router'])
+angular.module('cmm.pulse', ['cmm.services', 'ui.router'])
 .config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {  
   $stateProvider
     .state('pulse', {
