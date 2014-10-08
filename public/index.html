@@ -8,12 +8,11 @@
 
     <title>btc Market Monitor [beta]</title>
 
-    <!-- Bootstrap core CSS -->
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="lib/nsPopover/example/nsPopover.css">
     <link href="lib/bootstrap.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-
-    <!-- Google charts -->
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="css/loading.css" rel="stylesheet">    
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -22,111 +21,29 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body ng-app="cmm">
+    
+    <section id="intro">
+      <img class="logo" src="./img/cmm.png">
+      <cmm-splash></cmm-splash>
+    </section>
 
-    <div class="container">
-      <div class="page-header">
-        <h1 class="text-muted">btc Market Monitor <small>[beta]</small></h1>
-        <p class="lead">Making Bitcoin Market Data More Accessible</p>
-        <p>
-          btc Market Monitor is a new service that aggregates data from some of the 
-          largest bitcoin exchanges
-          and presents that data in intuitive ways to provide a broad overview of what is 
-          happening in the bitcoin markets.
-        </p>
-        <p>
-          To access the data in your own project, visit the
-          <a href="https://github.com/CryptoMarketMonitor/BroadcastServer">Broadcast Server github page</a>
-          or the <a href="https://www.npmjs.org/package/market-monitor"> npm module</a>.
-        </p>
-        <p>
-          If you have an exchange you'd like to be added, visit the
-          <a href="https://github.com/CryptoMarketMonitor/TradeListener">Trade Listener github page.</a>
-        </p>
-        <p>
-          Help us get better! Send feedback to <a href="mailto:feedback@marketmonitor.io">feedback@marketmonitor.io</a>
-        </p>
-        <p>
-          Disclaimer: This software and its associated data is provided as is, with no guarantee of validity or accuracy. 
-          <a href="disclaimer.html">Full Disclaimer and Licence</a>
-        </p>
-      </div>
-      <div class="clearfix">
-        <h3 class="text-muted">Summary Statistics<small> Last 24 Hours</small></h3>
-        <div class="col-md-2 col-sm-3 col-xs-6">BTC Volume:</div>
-        <div class="btcVolume col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">USD Volume:</div>
-        <div class="usdVolume col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">VWAP:</div>
-        <div class="vwap col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">Range:</div>
-        <div class="range col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">High:</div>
-        <div class="high col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">Low:</div>
-        <div class="low col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">Num Trades:</div>
-        <div class="numTrades col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">Mean Trade:</div>
-        <div class="aveTrade col-md-2 col-sm-3 col-xs-6"></div>
-        <div class="col-md-2 col-sm-3 col-xs-6">Volatility:</div>
-        <div class="volatility col-md-2 col-sm-3 col-xs-6"></div>
-      </div>
-      <hr>
-      <div class="clearfix">
-        <h3 class="text-muted">Price Chart<small> Last 24 Hours</small></h3>
-      </div>
-      <div id="priceChart">
+    <section id="nav">
+      <ul class="list-inline">
+        <li class="active"><a ui-sref="pulse">Pulse</a></li>
+        <li><a ui-sref="tape">Tape</a></li>
+        <li><a ui-sref="api" >API</a></li>
+      </ul>
+    </section>
+    
+    <section id="content" class="container" ui-view></section>
+    
 
-      </div>
-      <div id="volumeChart">
-      </div>
-      <hr>
-      <div class="clearfix">
-        <h3 class="text-muted">Price Distribution<small> Last 24 Hours</small></h3>
-      </div>
-      <div id="priceDistChart">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.13.2/easing/EasePack.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.13.2/TweenLite.min.js"></script>
+    <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart', 'gauge'],'language':'ru'}]}"></script>
 
-      </div>
-      <hr>
-      <div class="clearfix">
-        <h3 class="text-muted">Market Stability Indicators<small> Last 24 Hours</small></h3>
-        <div class="col-sm-4 gauge" id="coefficientOfVariationChart">
-        </div>
-        <div class="col-sm-4 gauge" id="rangeChart">
-        </div>
-        <div class="col-sm-4 gauge" id="volumeGaugeChart">
-        </div>
-        <p>
-          The market stability indicators are designed show the current state of the markets in terms of past data.
-          </p><p>
-          Each indicator is the percentile of the current observation in relation to past observations.
-          A value of 100 means that the current observation is the highest ever observed.
-          A value of 20 means the current observation is higher than 20% of past observations.
-        </p>
-      </div>
-      <hr>
-      <h3 class="text-muted col-sm-6 noPadding">Recent Trades <small> Max Last 20</small></h3>
-      <div class="tradeContainer clearfix">
-        <table class="table">
-          <tr class='headerRow'><th>Time</th><th>Price</th><th>Quantity</th><th>USD Value</th><th>Exchange</th></tr>
-        </table>
-      </div>
-      <div class="footer">
-        <a href="disclaimer.html">Disclaimer and License</a> - 
-        <a href="mailto:feedback@marketmonitor.io">feedback@marketmonitor.io</a> - 
-        <a href="https://github.com/CryptoMarketMonitor/MarketMonitor">Source</a>
-      </div>
-
-    </div> <!-- /container -->
-
-
-    <!-- Javascript -->
-    <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="lib/bootstrap.min.js"></script>
-    <script src="script.js"></script>
+    <script src="build/cmm.js"></script>
 
     <!-- Google Analytics Code -->
     <script>

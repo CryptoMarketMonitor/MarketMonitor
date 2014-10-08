@@ -1,0 +1,33 @@
+{
+  "name": "MarketMonitor",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jimobrien/MarketMonitor",
+  "authors": [
+    "Jim OBrien <jimobrien930@gmail.com>"
+  ],
+  "description": "A quick example of streaming data from BroadcastServer",
+  "main": "public/index.html",
+  "keywords": [
+    "bitcoin",
+    "cryptocurrency"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./public/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-socket-io": "~0.6.0",
+    "socket.io-client": "~1.1.0",
+    "underscore": "~1.7.0",
+    "angular": "~1.2.26",
+    "angular-ui-router": "~0.2.11",
+    "angular-animate": "~1.2.26",
+    "nsPopover": "~0.5.8"
+  }
+}
