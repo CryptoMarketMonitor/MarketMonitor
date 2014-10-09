@@ -10,6 +10,10 @@ angular.module('cmm', [
     .state('api', {
       url: '/api',
       templateUrl: './api.html',
+    })
+    .state('disclaimer', {
+      url: '/disclaimer',
+      templateUrl: './disclaimer.html'
     });
     $urlRouterProvider.otherwise('/pulse');
 
