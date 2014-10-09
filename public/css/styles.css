@@ -18,6 +18,10 @@ header h2 {
   /*font-size: 1.5em;*/
 }
 
+footer {
+  text-align: center;
+}
+
 
 /* jumbotron */
 #intro {
