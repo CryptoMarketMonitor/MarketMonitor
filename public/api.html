@@ -1,14 +1,142 @@
-<section id="api" class="row">
-  <article id="description">
-    <header><h2>Api</h2></header>
-    <section>
-      <p>btc Market Monitor is a new service that aggregates data from some of the largest bitcoin exchanges and presents that data in intuitive ways to provide a broad overview of what is happening in the bitcoin markets.</p>
-      <p>To access the data in your own project, visit the <a href="https://github.com/CryptoMarketMonitor/BroadcastServer">Broadcast Server github page</a> or the <a href="https://www.npmjs.org/package/market-monitor">npm module.</a></p>
-      <p>If you have an exchange you'd like to be added, visit the <a href="https://github.com/CryptoMarketMonitor/TradeListener">Trade Listener github page</a>.</p> 
-      <p>Help us get better! Send feedback to <a href="mailto:feedback@marketmonitor.io">feedback@marketmonitor.io</a></p>
-      <p>Disclaimer: This software and its associated data is provided as is, with no guarantee of validity or accuracy. <a href="http://marketmonitor.io/disclaimer.html">Full Disclaimer and Licence</a></p>
-    </section>
-  </article>
+<section id="api">
+
+    <article id="about">
+      <header><h2>About the API</h2></header>
+      <p>
+        The goal of the Crypto Market Monitor Project is to make market data more accessible.
+        The API is public and streamed via <a href="http://socket.io/">Socket.io</a>.
+      </p>
+      <p>
+        See the <a href="https://github.com/CryptoMarketMonitor/BroadcastServer">Broadcast Server source</a> on github.
+      </p>
+      <p>
+        See also the <a href="https://www.npmjs.org/package/market-monitor">market-monitor npm module</a>.
+      </p>
+    </article>
+
+    <article id="gettingStarted">
+      <header><h2>Getting Started</h2></header>
+      <h3>Base URL</h3>
+      <pre>http://api.marketmonitor.io</pre>
+      <h3>
+        Install Socket.io
+      </h3>
+      <p>
+        Using npm:
+        <pre>$ npm install socket.io-client --save</pre>
+      </p>
+      <p>
+        Using bower:<br />
+        <pre>$ bower install socket.io-client --save</pre>
+      </p>
+      <p>
+        Or load from the cdn:<br />
+        <pre>&lt;script src="https://cdn.socket.io/socket.io-1.1.0.js"&gt;&lt;/script&gt;</pre>
+      </p>
+      <h3>Connect to a Channel</h3>
+      <p>
+        For example, to connect to the trades channel:<br />
+        <pre>
+var trade = io('http://api.marketmonitor.io:80/BTC/USD/trades');
+trade.on('trade', function(trade) {
+   console.log('Trade:', trade);
+});
+        </pre>
+      </p>
+    </article>
+
+    <article id="trades">
+      <header><h2>Trades</h2></header>
+      <p>
+        Emits a trade event whenever a trade occurs and passes the associated trade data.<br />
+        <strong>/BTC/USD/trades</strong><br />
+        Event: 'trade'<br />
+        Data Format:
+      </p>
+      <pre>
+{
+    exchange: String,
+    date: Date,
+    price: Number,
+    amount: Number,
+    currency: 'BTC',
+    tCurrency: 'USD',
+    exchangeTradeID: String
+}</pre>
+    </article>
+
+    <article id="summary">
+      <header><h2>Summary Statistics</h2></header>
+      <p>
+        Emits an object containing market summary statistics.<br />
+        <strong>/BTC/USD/summary</strong><br />
+        Event: 'update'<br />
+        Data Format:
+      </p>
+      <pre>
+{
+    vwap: Number,
+    volume: Number,
+    high: Number,
+    low: Number,
+    variance: Number,
+    standardDeviation: Number,
+    coefficientOfVariation: Number,
+    range: Number,
+    numTrades: Number
+}</pre>
+    </article>
+
+    <article id="price">
+      <header><h2>Price Chart Data</h2></header>
+      <p>
+        Emits an array of datapoints useful for making price over time charts.<br />
+        <strong>/BTC/USD/priceCharts/:timeframe</strong><br />
+        Where timeframe is the timeframe of each datapoint.<br />
+        <strong>Options:</strong><br />
+        oneMinute<br />
+        fiveMinutes<br />
+        fifteenMinutes<br />
+        oneHour<br />
+        Event: 'update'<br />
+        Data Format:
+      </p>
+      <pre>
+[
+    {
+        date; Date,
+        high: Number,
+        low: Number,
+        open: Number,
+        close: Number,
+        vwap: Number,
+        volume: Number,
+        numTrades: Number
+    },
+    ...
+]</pre>
+    </article>
+
+    <article id="distribution">
+      <header><h2>Price Distribution Data</h2></header>
+      <p>
+        Emits an array of datapoints useful for making price distribution charts<br />
+        <strong>/BTC/USD/priceDistribution</strong><br />
+        Event: 'update'<br />
+        Data Format:
+      </p>
+      <pre>
+[
+    {
+        exchange: String,
+        price: Number,
+        volume: Number
+    },
+    ...
+]</pre>
+
+    </article>
+
 </section>
 
 
