@@ -1,0 +1,33 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+footer {
+  text-align: center;
+}
+
+.tradeFilter {
+  padding-bottom: 10px;
+}
+
+.gauge {
+  margin: auto;
+}
+
+.noPadding {
+  padding: 0;
+}
+
+.page-header {
+  margin: 5px 0 5px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
